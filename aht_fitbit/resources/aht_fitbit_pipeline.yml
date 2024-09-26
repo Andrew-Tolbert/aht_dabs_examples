@@ -1,0 +1,12 @@
+# The main pipeline for aht_fitbit
+resources:
+  pipelines:
+    aht_fitbit_pipeline:
+      name: aht_fitbit_pipeline
+      target: aht_fitbit_${bundle.environment}
+      libraries:
+        - notebook:
+            path: ../src/dlt_pipeline.ipynb
+
+      configuration:
+        bundle.sourcePath: /Workspace/${workspace.file_path}/src

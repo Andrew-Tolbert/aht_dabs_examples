@@ -2,6 +2,9 @@
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: aht_hello_dabs
+variables:
+  var_env:
+    description: Variable for environment, passed through and accessed at run time
 
 include:
   - resources/*.yml
@@ -18,10 +21,12 @@ targets:
     workspace:
       host: https://e2-dogfood.staging.cloud.databricks.com/
       profile: aht-dogfood
+    variables:
+      var_env: "e2-dogfood"
 
   # The 'prod' target, used for production deployment.
   prod:
-    # We use 'mode: production' to indicate this is a production deployment.
+    # We use 'mode: production' to indicate this a production deployment.
     # Doing so enables strict verification of the settings below.
     mode: development
     workspace:
@@ -34,3 +39,5 @@ targets:
       # This runs as andrew.tolbert@databricks.com in production. We could also use a service principal here,
       # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
       user_name: andrew.tolbert@databricks.com
+    variables:
+      var_env: "e2-demo"

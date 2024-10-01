@@ -1,0 +1,35 @@
+resources:
+  jobs:
+    aht_hello_dabs_job_serverless:
+      name: aht_hello_dabs_job_serverless
+
+      # Run this job once an hour.
+      trigger:
+        periodic:
+          interval: 1
+          unit: HOURS
+
+      tasks:
+        - task_key: python_task
+          spark_python_task:
+            python_file: ../src/task.py
+         # The key that references an environment spec in a job.
+          environment_key: cow_env
+
+        - task_key: notebook_task
+          notebook_task:
+            notebook_path: ../src/notebook_serverless.ipynb
+
+      # A list of task execution environment specifications that can be referenced by tasks of this job.
+      environments:
+        - environment_key: cow_env
+
+          # Full documentation of this spec can be found at:
+          # https://docs.databricks.com/api/workspace/jobs/create#environments-spec
+          spec:
+            client: "1"
+            dependencies:
+              - cowsay
+      parameters:
+        - name: job_env
+          default: ${var.var_env} 

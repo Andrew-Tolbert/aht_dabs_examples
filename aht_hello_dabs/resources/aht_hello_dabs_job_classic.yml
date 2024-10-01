@@ -1,0 +1,36 @@
+resources:
+  jobs:
+    aht_hello_dabs_job_classic:
+      name: aht_hello_dabs_job_classic
+      # Run this job once an hour.
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: HOURS
+
+      tasks:
+        - task_key: python_task
+          spark_python_task:
+            python_file: ../src/task.py
+          existing_cluster_id: 0926-131603-lrilyxop
+          libraries:
+            - whl: ../dist/*.whl
+          # libraries: 
+          #   - pypi:
+          #         package: cowsay
+         # The key that references an environment spec in a job.
+
+        - task_key: notebook_task
+          # depends_on:
+          # - task_key: task_0
+          notebook_task:
+            notebook_path: ../src/notebook.ipynb
+          existing_cluster_id: 0926-131603-lrilyxop
+          libraries:
+            - whl: ../dist/*.whl
+      # A list of task execution environment specifications that can be referenced by tasks of this job.
+
+      parameters:
+        - name: job_env
+          default: ${var.var_env} 

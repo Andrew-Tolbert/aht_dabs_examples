@@ -27,6 +27,7 @@ targets:
   # The 'prod' target, used for production deployment.
   prod:
     # We use 'mode: production' to indicate this a production deployment.
+    # Don't allow dev team to create jobs in production, funnel everything through SPs 
     # Doing so enables strict verification of the settings below.
     mode: development
     workspace:
@@ -34,10 +35,10 @@ targets:
       profile: aht-e2
       # We always use /Users/andrew.tolbert@databricks.com for all resources to make sure we only have a single copy.
       # If this path results in an error, please make sure you have a recent version of the CLI installed.
-      root_path: /Users/andrew.tolbert@databricks.com/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Users/andrew.tolbert@databricks.com/.bundle/${bundle.name}/${bundle.target} #should be sp or shared folder (up to customer)
     run_as:
       # This runs as andrew.tolbert@databricks.com in production. We could also use a service principal here,
       # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
-      user_name: andrew.tolbert@databricks.com
+      user_name: andrew.tolbert@databricks.com #make this SP
     variables:
       var_env: "e2-demo"

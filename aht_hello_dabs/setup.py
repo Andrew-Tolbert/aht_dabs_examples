@@ -17,7 +17,7 @@ setup(
     name="aht_hello_dabs",
     # We use timestamp as Local version identifier (https://peps.python.org/pep-0440/#local-version-identifiers.)
     # to ensure that changes to wheel package are picked up when used on all-purpose clusters
-    version=aht_hello_dabs.__version__ + "+" + datetime.datetime.utcnow().strftime("%Y%m%d.%H%M%S"),
+    version=aht_hello_dabs.__version__ + "+" + "v1",
     url="https://databricks.com",
     author="andrew.tolbert@databricks.com",
     description="wheel file based on aht_hello_dabs/src",

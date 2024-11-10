@@ -8,8 +8,17 @@ import time
 from xml.etree import ElementTree as ET
 from pyspark.sql.functions import explode, col, regexp_replace,to_json
 # RELEVANT TIME VARS FOR INCREMENTAL AND BATCH LOADS
-from dateutil.relativedelta import relativedelta
 
+#Date Variables
+date_0 = dt.date.today()
+date_1 = (date_0 - dt.timedelta(days = 1))
+date_7 = (date_0 - dt.timedelta(days = 7))
+# for bulk data 
+date_120 = (date_0 - dt.timedelta(days = 150))
+date_monthStart = (date_0.replace(day=1))
+
+
+#Fitbit Client Variables
 client_id = '2395FL' 
 base_url = 'https://api.fitbit.com/'
 vol = '/Volumes/ahtsa/fitbit' 
@@ -18,7 +27,10 @@ def get_vars():
    return {
         'client_id ': client_id,
         'base_url':base_url,
-        'vol': vol
+        'vol': vol,
+        'date_0':date_0,
+        'date_1':date_1,
+        'date_7':date_7
     }
 
 def get_taxis(spark: SparkSession) -> DataFrame:
@@ -33,18 +45,6 @@ def get_spark() -> SparkSession:
     return DatabricksSession.builder.getOrCreate()
   except ImportError:
     return SparkSession.builder.getOrCreate()
-
-def main():
-  get_taxis(get_spark()).show(5)
-
-
-date_0 = dt.date.today()
-date_1 = (date_0 - dt.timedelta(days = 1))
-date_7 = (date_0 - dt.timedelta(days = 7))
-# for bulk data 
-date_120 = (date_0 - dt.timedelta(days = 150))
-date_monthStart = (date_0.replace(day=1))
-date_5Mo = date_monthStart - relativedelta(months = 5)
 
 # LOAD CREDS FROM JSON
 def get_creds():
@@ -79,13 +79,16 @@ def refresh_access_token(creds):
       json.dump(json.loads(response.text), json_file)
       print('rewrote file')
 
-def get_sleep(creds,date): 
+def get_sleep(creds,config,date): 
+    
+    base_url = config['base_url']
+
     url = f"{base_url}1.2/user/{creds['user_id']}/sleep/date/{date}.json"
     
     payload={
         }
     headers = {
-      'Authorization': f"Bearer {creds['access_token']}"
+      "Authorization": f"Bearer {creds['access_token']}"
     }
     
     err = 0
@@ -98,7 +101,9 @@ def get_sleep(creds,date):
         err += 1 
         return 'NA','NA',err
       
-def get_activities(creds,date): 
+def get_activities(creds,config,date): 
+    
+    base_url = config['base_url']
     url = f"{base_url}1/user/{creds['user_id']}/activities/date/{date}.json"
     
     payload={
@@ -117,14 +122,14 @@ def get_activities(creds,date):
         err += 1 
         return 'NA','NA',err
 
-def get_activityLogList(creds,date,limit): 
+def get_activityLogList(creds,config,date,limit): 
     """
     THIS API OPERATES WITH A START DATE AND A LIMIT 
     EX - START ON 2022-09-20 AND GO TO 2022-09-30
     https://dev.fitbit.com/build/reference/web-api/activity/get-activity-log-list/
     11/18/23 - Return Max Date within the file
     """
-    
+    base_url = config['base_url']
     url = f"{base_url}1/user/{creds['user_id']}/activities/list.json?afterDate={date}&sort=asc&offset=0&limit={limit}"
     
     payload={
@@ -160,14 +165,14 @@ def getTCX(creds,url):
       return 'NA','NA',err
     return response.text,filename,err
 
-def s3_interval_update(creds,endpoint,start,end,sleep):
-    while start <= end:
+def s3_interval_update(creds,config,endpoint,start,end,sleep): 
+   while start <= end:
       _day = start.strftime('%Y-%m-%d')
       match endpoint:
         case 'sleep':
-            filename,data,err = get_sleep(_day,creds['access_token'])
+            filename,data,err = get_sleep(creds,config,_day)
         case 'activities':
-            filename,data,err = get_activities(_day,creds['access_token'])
+            filename,data,err = get_activities(creds,config,_day)
         case _:
             print("Provide a valid service to call")
       if err == 0:
@@ -181,11 +186,12 @@ def s3_interval_update(creds,endpoint,start,end,sleep):
           break
 
 
-def s3_interval_activities(creds,start,end,limit,sleep):
+def s3_interval_activities(creds,config,start,end,limit,sleep):
     buffer = 4
+    spark = get_spark()
     while start <= end:
       _day = start.strftime('%Y-%m-%d')
-      filename,data,err = get_activityLogList(_day,creds['access_token'],limit) 
+      filename,data,err = get_activityLogList(creds,config,_day,limit) 
       if err == 0:
           write_json(f'raw_fitbitapi/activitylog',filename,data) 
           print(f"{filename}")
@@ -206,7 +212,7 @@ def s3_interval_activities(creds,start,end,limit,sleep):
             tcxList = tcxDf.select("tcxLink").distinct().collect()
 
             for x in tcxList:
-              tcxResponse,tcxFilename,tcxErr = getTCX(x[0])
+              tcxResponse,tcxFilename,tcxErr = getTCX(creds,x[0])
               if tcxErr ==0:
                 write_xml('raw_fitbitapi/TCX',tcxFilename,tcxResponse)
                 print(tcxFilename)
@@ -231,6 +237,10 @@ def write_xml(path,filename,data):
     """
     with open(f'{vol}/{path}/{filename}', 'w') as xml_file:
       xml_file.write(data)
+
+def main():
+  get_taxis(get_spark()).show(5)
+
 
 if __name__ == '__main__':
   main()

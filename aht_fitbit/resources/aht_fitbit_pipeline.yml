@@ -3,10 +3,15 @@ resources:
   pipelines:
     aht_fitbit_pipeline:
       name: aht_fitbit_pipeline
-      target: aht_fitbit_${bundle.environment}
+      development: true
+      continuous: false
+      channel: "PREVIEW"
+      serverless: true
+      catalog: ${var.var_catalog} 
+      target: ${var.var_schema} 
       libraries:
         - notebook:
-            path: ../src/dlt_pipeline.ipynb
+            path: ../src/fitbit_pipeline.ipynb
 
       configuration:
         bundle.sourcePath: /Workspace/${workspace.file_path}/src

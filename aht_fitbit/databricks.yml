@@ -9,6 +9,8 @@ variables:
     description: Catalog for the environment 
   var_schema:
     description: Schema for the environment 
+  var_task_param:
+    description: Task parameter testing
 
 include:
   - resources/*.yml

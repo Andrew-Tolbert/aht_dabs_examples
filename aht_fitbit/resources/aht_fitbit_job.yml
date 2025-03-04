@@ -14,7 +14,7 @@ resources:
           notebook_task:
             notebook_path: ../src/notebook_0_tokenCheck.ipynb
             base_parameters: 
-              task_param: "task_value"
+              task_param: ${var.var_task_param}
         - task_key: 1_fileWrite
           depends_on:
             - task_key: 0_tokenCheck

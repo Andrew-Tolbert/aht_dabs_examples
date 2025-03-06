@@ -14,7 +14,7 @@ resources:
           notebook_task:
             notebook_path: ../src/notebook_0_tokenCheck.ipynb
             base_parameters: 
-              task_param: ${var.var_task_param}
+              task_param: "{{job.parameters.job_pass_to_task}}"
         - task_key: 1_fileWrite
           depends_on:
             - task_key: 0_tokenCheck
@@ -29,3 +29,5 @@ resources:
       parameters:
         - name: job_env
           default: ${var.var_env} 
+        - name: job_pass_to_task
+          default: ${var.var_task_param}

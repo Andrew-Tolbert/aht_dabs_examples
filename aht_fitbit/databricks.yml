@@ -29,6 +29,7 @@ targets:
       var_env: "e2-demo"
       var_catalog: "ahtsa"
       var_schema: "fitbit"
+      var_task_param: "pass_to_task"
 
   prod:
     mode: production

@@ -7,6 +7,16 @@ bundle:
 include:
   - resources/*.yml
 
+variables:
+  var_env:
+    description: Variable for environment, passed through and accessed at run time
+  var_catalog:
+    description: Catalog for the environment 
+  var_schema:
+    description: Schema for the environment 
+  var_task_param:
+    description: Task parameter testing
+
 targets:
   dev:
     # The default target uses 'mode: development' to create a development copy.
@@ -17,6 +27,11 @@ targets:
     default: true
     workspace:
       host: https://e2-demo-field-eng.cloud.databricks.com
+    variables:
+      var_env: "e2-demo"
+      var_catalog: "ahtsa"
+      var_schema: "buildastream"
+      var_task_param: "pass_to_task"
 
   prod:
     mode: production
@@ -27,3 +42,8 @@ targets:
     permissions:
       - user_name: andrew.tolbert@databricks.com
         level: CAN_MANAGE
+    variables:
+      var_env: "e2-demo"
+      var_catalog: "ahtsa"
+      var_schema: "buildastream"
+      var_task_param: "pass_to_task"

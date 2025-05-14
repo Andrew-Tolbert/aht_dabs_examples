@@ -1,9 +1,0 @@
-variables:
-  var_env:
-    description: Variable for environment, passed through and accessed at run time
-  var_catalog:
-    description: Catalog for the environment 
-  var_schema:
-    description: Schema for the environment 
-  var_task_param:
-    description: Task parameter testing

@@ -10,23 +10,18 @@ resources:
           interval: 1
           unit: DAYS
 
-      email_notifications:
-        on_failure:
-          - andrew.tolbert@databricks.com
-
       tasks:      
-        - task_key: main_task
-          depends_on:
-            - task_key: refresh_pipeline
-          python_wheel_task:
-            package_name: build_a_stream
-            entry_point: main
-          libraries:
-            # By default we just include the .whl file generated for the build_a_stream package.
-            # See https://docs.databricks.com/dev-tools/bundles/library-dependencies.html
-            # for more information on how to add other libraries.
-            - whl: ../dist/*.whl
-        
         - task_key: notebook_task
+          # depends_on:
+          #   - task_key: main_task
           notebook_task:
-            notebook_path: ../src/notebook.ipynb
+            notebook_path: ../src/0_init.ipynb
+      parameters:
+        - name: job_env
+          default: ${var.var_env} 
+        - name: job_pass_to_task
+          default: ${var.var_task_param}
+        - name: catalog
+          default: ${var.var_catalog}      
+        - name: schema
+          default: ${var.var_schema}

@@ -14,8 +14,18 @@ variables:
     description: Catalog for the environment 
   var_schema:
     description: Schema for the environment 
-  var_task_param:
-    description: Task parameter testing
+  var_stream_length_m:
+    description: Length of the stream in meters
+  var_files_per_m:
+    description: Number of files per meter
+  var_reset_data:
+    description: Flag to reset data
+  var_streaming_mode:
+    description: Streaming mode
+  var_streaming_file_size_m:
+    description: Streaming file size in meters
+  var_compression:
+    description: Compression type
 
 targets:
   dev:
@@ -31,7 +41,12 @@ targets:
       var_env: "e2-demo"
       var_catalog: "ahtsa"
       var_schema: "buildastream"
-      var_task_param: "pass_to_task"
+      var_stream_length_m: "5"
+      var_files_per_m: "10"
+      var_reset_data: "Y"
+      var_streaming_mode: "N"
+      var_streaming_file_size_m: "0.2"
+      var_compression: "N"
 
   prod:
     mode: production
@@ -46,4 +61,11 @@ targets:
       var_env: "e2-demo"
       var_catalog: "ahtsa"
       var_schema: "buildastream"
-      var_task_param: "pass_to_task"
+      var_stream_length_m: "5"
+      var_files_per_m: "10"
+      var_reset_data: "Y"
+      var_streaming_mode: "Y"
+      var_streaming_file_size_m: "0.1"
+      var_compression: "N"
+
+

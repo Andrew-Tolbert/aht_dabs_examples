@@ -16,12 +16,32 @@ resources:
           #   - task_key: main_task
           notebook_task:
             notebook_path: ../src/0_init.ipynb
+          environment_key: build_a_stream_env
+     
+      environments:
+        - environment_key: build_a_stream_env
+          spec:
+            client: '2'
+            dependencies:
+              - faker
+              - zstandard
+
       parameters:
         - name: job_env
           default: ${var.var_env} 
-        - name: job_pass_to_task
-          default: ${var.var_task_param}
         - name: catalog
           default: ${var.var_catalog}      
         - name: schema
           default: ${var.var_schema}
+        - name: stream_length_m
+          default: ${var.var_stream_length_m}
+        - name: files_per_m
+          default: ${var.var_files_per_m}
+        - name: reset_data
+          default: ${var.var_reset_data} 
+        - name: streaming_mode
+          default: ${var.var_streaming_mode}
+        - name: streaming_file_size_m
+          default: ${var.var_streaming_file_size_m}
+        - name: compression
+          default: ${var.var_compression} 
